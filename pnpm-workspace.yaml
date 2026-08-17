@@ -231,6 +231,24 @@ overrides:
   uuid: "catalog:"
   "fast-uri@<3.1.5": "3.1.5"
   "js-yaml@4": 4.3.0
+  # GHSA-pm4m-ph32-ghv5 / CVE-2026-73643 (HIGH, ReDoS in flow collections)
+  # hits js-yaml >= 5.0.0 <= 5.2.1, fixed in 5.2.2.
+  #
+  # The `@3` and `@4` entries above do NOT constrain the 5.x line, so without
+  # this entry the root looks correctly pinned while still being free to
+  # resolve 5.2.1 on the next lockfile regeneration.
+  #
+  # No dependency in this root reaches js-yaml 5.x today, so this floor is
+  # preventive. The known way in is @nestjs/swagger, which as of 11.4.6 pins
+  # `js-yaml: 5.2.1` EXACTLY (not a range) as a production dependency, so it
+  # survives dev-only pruning into the runtime image and offers no upstream
+  # bump to take. A root that later adds or bumps into it takes the vulnerable
+  # version silently -- that is what failed the Trivy hard gate in
+  # tv-module-checklists PR #60.
+  #
+  # Scoped to `@5` on purpose. A bare `js-yaml: ^5.2.2` would drag the @3 and
+  # @4 consumers onto 5.x, which is a different and larger change.
+  "js-yaml@5": ^5.2.2
   linkify-it: 5.0.2
   body-parser: 1.20.6
   "@react-router/node": 7.18.1
