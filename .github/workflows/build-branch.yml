@@ -367,6 +367,12 @@ jobs:
     if: ${{ needs.branch_build_setup.outputs.build_type == 'Release' }}
     name: Build Release
     runs-on: ubuntu-22.04
+    # softprops/action-gh-release creates a GitHub Release with GITHUB_TOKEN,
+    # which requires contents: write. This job used to inherit that from the
+    # organisation default; that default is now `read`, so the scope has to be
+    # requested explicitly here or the release step fails with 403.
+    permissions:
+      contents: write
     needs:
       [
         branch_build_setup,
